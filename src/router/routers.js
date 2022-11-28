@@ -6,15 +6,21 @@ import Register from "../pages/Register";
 
 export default[ {
     path:'/',
-    component:Home
+    component:Home,
 },{
     name:'search',
     path:'/search/:keyword?',
-    component:Search
+    component:Search,
 },{
     path:'/login',
-    component:Login
+    component:Login,
+    meta:{
+        isHideFooter:true
+    }
 },{
     path:'/register',
-    component:Register
+    component:Register,
+    meta:{
+        isHideFooter:true
+    }
 } ]
