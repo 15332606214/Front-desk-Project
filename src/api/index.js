@@ -10,7 +10,7 @@ export function getCategoryList(){
     // return ajax.get('/probuct/getBaseCategoryList')
     // return ajax('/probuct/getBaseCategoryList') //发不带参数的get请求
     return ajax({
-        url:'/probuct/getBaseCategoryList',
+        url:'/product/getBaseCategoryList',
         method:'get'
     })
 }
