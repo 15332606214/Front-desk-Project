@@ -1692,6 +1692,11 @@
 </template>
 
 <script>
+/* 
+1，dispatch()触发发请求的异步actions调用 => 数据从后台接口请求到vuex的state中
+2，store.state / mapState()
+*/
+
 export default {
   name:'TypeNav'
 }

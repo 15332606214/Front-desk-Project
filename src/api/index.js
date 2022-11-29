@@ -6,7 +6,7 @@
 import ajax from "./ajax";
 
 // 首页三级分类 地址:/probuct/getBaseCategoryList GET 无参
-export function getCategoryList(){
+export function reqCategoryList(){
     // return ajax.get('/probuct/getBaseCategoryList')
     // return ajax('/probuct/getBaseCategoryList') //发不带参数的get请求
     return ajax({
