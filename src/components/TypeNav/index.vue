@@ -1693,7 +1693,7 @@
 
 <script>
 export default {
-
+  name:'TypeNav'
 }
 </script>
 
