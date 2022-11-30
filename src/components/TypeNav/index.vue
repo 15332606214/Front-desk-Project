@@ -1,7 +1,45 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
+      <div @mouseleave="hideFirst" @mouseenter="showFirst">
+        <h2 class="all">全部商品分类</h2>
+        <div class="sort" v-show="isShowFirst">
+          <div class="all-sort-list2" @click="toSearch">
+            <div class="item" v-for="(c1, index) in categoryList" :key="c1.categoryId"
+              :class="{ active: currentIndex === index }" @mouseenter="showSubList(index)">
+              <h3>
+                <a href="javascript:" :data-categoryName="c1.categoryName"
+                  :data-category1Id="c1.categoryId">{{ c1.categoryName }}</a>
+                <!-- 使用编程式导航，每个分类项都绑定了监听，数量太多 -->
+                <!-- <a href="javascript:" @click="router.$push(`/search?categoryName=${c1.categoryName}&categoryId1=${c1.categoryId}`)">{{c1.categoryName}}</a> -->
+                <!-- 使用声明式导航<router-link>太多，导致显示慢 -->
+                <!-- <router-link :to="`/search?categoryName=${c1.categoryName}&categoryId1=${c1.categoryId}`">{{c1.categoryName}}</router-link> -->
+              </h3>
+              <div class="item-list clearfix">
+                <div class="subitem">
+                  <dl class="fore" v-for="c2 in c1.categoryChild" :key="c2.categoryId">
+                    <dt>
+                      <a href="javascript:" :data-categoryName="c2.categoryName"
+                        :data-category2Id="c2.categoryId">{{ c2.categoryName }}</a>
+                      <!-- <a href="javascript:" @click="$router.push(`/search?categoryName=${c2.categoryName}&categoryId2=${c2.categoryId}`)">{{c2.categoryName}}</a> -->
+                      <!-- <router-link :to="`/search?categoryName=${c2.categoryName}&categoryId2=${c2.categoryId}`">{{c2.categoryName}}</router-link> -->
+                    </dt>
+                    <dd>
+                      <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
+                        <a href="javascript:" :data-categoryName="c3.categoryName"
+                          :data-category3Id="c3.categoryId">{{ c3.categoryName }}</a>
+                        <!-- <a href="javascript:" @click="$router.push(`/search?categoryName=${c3.categoryName}&categoryId3=${c3.categoryId}`)">{{c3.categoryName}}</a> -->
+                        <!-- <router-link :to="`/search?categoryName=${c3.categoryName}&categoryId3=${c3.categoryId}`">{{c3.categoryName}}</router-link> -->
+                      </em>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
       <nav class="nav">
         <a href="###">服装城</a>
         <a href="###">美妆馆</a>
@@ -12,38 +50,7 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
-      <div class="sort">
-        <div class="all-sort-list2" @click="toSearch">
-          <div class="item" v-for="c1 in categoryList" :key="c1.categoryId">
-            <h3>
-              <a href="javascript:" :data-categoryName="c1.categoryName" :data-category1Id="c1.categoryId">{{c1.categoryName}}</a>
-              <!-- 使用编程式导航，每个分类项都绑定了监听，数量太多 -->
-              <!-- <a href="javascript:" @click="router.$push(`/search?categoryName=${c1.categoryName}&categoryId1=${c1.categoryId}`)">{{c1.categoryName}}</a> -->
-              <!-- 使用声明式导航<router-link>太多，导致显示慢 -->
-              <!-- <router-link :to="`/search?categoryName=${c1.categoryName}&categoryId1=${c1.categoryId}`">{{c1.categoryName}}</router-link> -->
-            </h3>
-            <div class="item-list clearfix">
-              <div class="subitem">
-                <dl class="fore" v-for="c2 in c1.categoryChild" :key="c2.categoryId">
-                  <dt>
-                    <a href="javascript:" :data-categoryName="c2.categoryName" :data-category2Id="c2.categoryId">{{c2.categoryName}}</a>
-                    <!-- <a href="javascript:" @click="$router.push(`/search?categoryName=${c2.categoryName}&categoryId2=${c2.categoryId}`)">{{c2.categoryName}}</a> -->
-                    <!-- <router-link :to="`/search?categoryName=${c2.categoryName}&categoryId2=${c2.categoryId}`">{{c2.categoryName}}</router-link> -->
-                  </dt>
-                  <dd>
-                    <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
-                      <a href="javascript:" :data-categoryName="c3.categoryName" :data-category3Id="c3.categoryId">{{c3.categoryName}}</a>
-                      <!-- <a href="javascript:" @click="$router.push(`/search?categoryName=${c3.categoryName}&categoryId3=${c3.categoryId}`)">{{c3.categoryName}}</a> -->
-                      <!-- <router-link :to="`/search?categoryName=${c3.categoryName}&categoryId3=${c3.categoryId}`">{{c3.categoryName}}</router-link> -->
-                    </em>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-          
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
@@ -55,39 +62,84 @@
 3，在模板中动态显示
 */
 import { mapState } from "vuex";
+// import _ from "lodash"; //整体引入太大(4m)，按需引入
+import throttle from "lodash/throttle"; //按需引入，减小打包文件
+
 export default {
-  name:'TypeNav',
-  computed:{
+  name: 'TypeNav',
+  data() {
+    return {
+      isShowFirst:false,//是否显示一级列表
+      currentIndex: -2
+    }
+  },
+  created(){
+    const path = this.$route.path
+    if(path==='/') {
+      this.isShowFirst = true
+    }
+  },
+  computed: {
     // categoryList() {
     //   return this.$store.state.home.categoryList
     // }
     ...mapState({
-      categoryList:state => state.home.categoryList //函数接收的是总状态，返回值作为计算属性· 
+      categoryList: state => state.home.categoryList //函数接收的是总状态，返回值作为计算属性· 
     })
   },
-  methods:{
-    toSearch (event) {
+  methods: {
+    // 显示一级列表
+    showFirst() {
+      // 标识当前已经进入包含分类的div
+      this.currentIndex=-1
+      // 鼠标进入显示一级分类
+      this.isShowFirst = true
+    },
+    // 隐藏一级列表
+    hideFirst(){
+      // 表示当前已经离开div
+      this.currentIndex=-2
+      // 如果当前不是首页隐藏一级列表
+      if(this.$route.path!=='/') {
+        this.isShowFirst = false
+      }
+
+    },
+
+
+    // 显式指定下标的子分类
+    showSubList:throttle(function (index) { //这个事件监听回调函数调用频率太高,下载引入lodash解决这个问题
+      console.log('throttle',index)
+      // 只有当没有离开整个分类的div时才更新下标
+      if(this.currentIndex!==-2)
+      this.currentIndex = index;
+    },100,/* {
+      trailing:false, //最后一次事件不延迟处理
+    } */),
+
+    // 跳转到搜索页
+    toSearch(event) {
       const target = event.target
       // alert(target.tagName)
       console.dir(target)
       // 取出data自定义属性值
-      const {categoryname,category1id,category2id,category3id} = target.dataset
+      const { categoryname, category1id, category2id, category3id } = target.dataset
       // if(target.tagName.toUpperCase()==='A'){
-      if(categoryname){
+      if (categoryname) {
         // 准备query参数
         const query = {
-          categoryname:categoryname
+          categoryname: categoryname
         }
-        if (category1id){
-          query.category1Id=category1id
-        }else if(category2id){
-          query.category2Id=category2id
-        }else if (category3id){
-          query.category3Id=category3id
+        if (category1id) {
+          query.category1Id = category1id
+        } else if (category2id) {
+          query.category2Id = category2id
+        } else if (category3id) {
+          query.category3Id = category3id
         }
         // 跳转到search
         this.$router.push({
-          name:'search',
+          name: 'search',
           query
         })
       }
@@ -206,7 +258,9 @@ export default {
             }
           }
 
-          &:hover {
+          &.active {
+            background-color: #ccc;
+
             .item-list {
               display: block;
             }

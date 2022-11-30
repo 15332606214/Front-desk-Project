@@ -9,7 +9,7 @@ const state = {
 const mutations = {
     // 接受保持分类列表
     RECEIVE_CATEGORY_LIST(state,categoryList) {
-        state.categoryList = categoryList.splice(0,16)
+        state.categoryList = categoryList.splice(0,15)
     }
 }
 const actions = {
