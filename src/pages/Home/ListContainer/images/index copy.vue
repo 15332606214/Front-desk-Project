@@ -3,14 +3,19 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--banner轮播-->
-        <swiper :options="swiperOptions">
-            <swiper-slide class="swiper-slide" v-for="banner in bannerList" :key="banner.id">
+        <div class="swiper-container" id="mySwiper">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide" v-for="banner in bannerList" :key="banner.id">
               <img :src="banner.imageUrl" />
-            </swiper-slide>
-          <div class="swiper-pagination" slot="pagination"></div>
-          <div class="swiper-button-prev" slot="button-prev"></div>
-          <div class="swiper-button-next" slot="button-next"></div>
-        </swiper>
+            </div>
+          </div>
+          <!-- 如果需要分页器 -->
+          <div class="swiper-pagination"></div>
+
+          <!-- 如果需要导航按钮 -->
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+        </div>
       </div>
       <div class="right">
         <div class="news">
@@ -101,14 +106,25 @@ import { mapState } from "vuex";
 
 export default {
   name: 'ListContainer',
-  data(){
-    return {
-      swiperOptions:{
-          loop: true, // 循环模式选项
+  computed: {
+    ...mapState({
+      bannerList: state => state.home.bannerList
+    })
+  },
+
+  // 在列表数据已经有了，且已经显示更新
+  watch: {
+    bannerList() {   //此时只是数据有了，界面还未更新
+      // $nextTick(callback)
+      // 将回调延迟到下次DOM更新循环之后执行。在修改数据后立即使用它，然后等待DOM更新
+      this.$nextTick(() => {
+        // swiper要在对象创建之后才能使用
+        new Swiper('#mySwiper', {
           autoplay: {
             delay: 3000,
             disableOnInteraction: false //用户操作后是否停止自动轮播
           }, //自动轮播
+          loop: true, // 循环模式选项
 
           // 如果需要分页器
           pagination: {
@@ -120,43 +136,10 @@ export default {
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
           },
-      }
+        })
+      })
     }
-  },
-  computed: {
-    ...mapState({
-      bannerList: state => state.home.bannerList
-    })
-  },
-
-  // 在列表数据已经有了，且已经显示更新
-  // watch: {
-  //   bannerList() {   //此时只是数据有了，界面还未更新
-  //     // $nextTick(callback)
-  //     // 将回调延迟到下次DOM更新循环之后执行。在修改数据后立即使用它，然后等待DOM更新
-  //     this.$nextTick(() => {
-  //       // swiper要在对象创建之后才能使用
-  //       new Swiper(this.$refs.swiper, {
-  //         loop: true, // 循环模式选项
-  //         autoplay: {
-  //           delay: 3000,
-  //           disableOnInteraction: false //用户操作后是否停止自动轮播
-  //         }, //自动轮播
-
-  //         // 如果需要分页器
-  //         pagination: {
-  //           el: '.swiper-pagination',
-  //         },
-
-  //         // 如果需要前进后退按钮
-  //         navigation: {
-  //           nextEl: '.swiper-button-next',
-  //           prevEl: '.swiper-button-prev',
-  //         },
-  //       })
-  //     })
-  //   }
-  // }
+  }
 }
 </script>
   
