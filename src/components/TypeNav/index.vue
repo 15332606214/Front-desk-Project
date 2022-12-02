@@ -113,7 +113,6 @@ export default {
 
     // 显式指定下标的子分类
     showSubList: throttle(function (index) { //这个事件监听回调函数调用频率太高,下载引入lodash解决这个问题
-      console.log('throttle', index)
       // 只有当没有离开整个分类的div时才更新下标
       if (this.currentIndex !== -2)
         this.currentIndex = index;
