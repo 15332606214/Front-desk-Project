@@ -66,6 +66,17 @@ export default {
       }
       this.$router.push(location,()=>{})
     }
+  },
+
+  mounted () {
+    // 在Header中绑定自定义事件监听，在回调中清除数据
+    this.$bus.$on('removeKeyword',() => {
+      this.keyword = ''
+    })
+  },
+  //在Header组件死亡前解绑事件监听：在beforeDestory中
+  beforeDestroy () {
+    this.$bus.off('removeKeyword')
   }
 }
 
