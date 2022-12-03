@@ -32,7 +32,7 @@
       </h1>
       <div class="searchArea">
         <form action="###" class="searchForm">
-          <input type="text" id="autocomplete" class="input-error input-xxlarge" v-model.trim="keyword"/>
+          <input type="text" id="autocomplete" class="input-error input-xxlarge" v-model.trim="keyword" />
           <button class="sui-btn btn-xlarge btn-danger" type="button" @click.prevent="search">搜索</button>
         </form>
       </div>
@@ -43,39 +43,46 @@
 <script>
 export default {
   name: 'Header',
-  data(){
+  data() {
     return {
-      keyword:''
+      keyword: ''
     }
   },
-  methods:{
-    search(){
+  methods: {
+    search() {
       // this.$router.push(`/search/${this.keyword}`)
       const location = {
-        name:'search',
-        query:this.$route.query
+        name: 'search',
+        query: this.$route.query
       }
       // 判断。有数据时才携带params参数
-      if(this.keyword){
-        location.params={
-          keyword:this.keyword
+      if (this.keyword) {
+        location.params = {
+          keyword: this.keyword
         }
         /* location.query={
           keyword2:this.keyword.toUpperCase()
         } */
       }
-      this.$router.push(location,()=>{})
+      // 跳转到search
+      // 从其他页跳转到搜索页:push()
+      // 从搜索页跳转到搜索页:replace()
+      if (this.$route.name === "search") {
+        this.$router.replace(location)
+      } else {
+        this.$router.push(location)
+      }
     }
   },
 
-  mounted () {
+  mounted() {
     // 在Header中绑定自定义事件监听，在回调中清除数据
-    this.$bus.$on('removeKeyword',() => {
+    this.$bus.$on('removeKeyword', () => {
       this.keyword = ''
     })
   },
   //在Header组件死亡前解绑事件监听：在beforeDestory中
-  beforeDestroy () {
+  beforeDestroy() {
     this.$bus.off('removeKeyword')
   }
 }

@@ -140,12 +140,22 @@ export default {
         } else if (category3id) {
           query.category3Id = category3id
         }
-        // 跳转到search
-        this.$router.push({
+
+        const location = {
           name: 'search',
           query,
-          params:this.$route.params //需要携带上当前已有params参数
-        })
+          params: this.$route.params //需要携带上当前已有params参数
+        }
+
+        // 跳转到search
+        // 从其他页跳转到搜索页:push()
+        // 从搜索页跳转到搜索页:replace()
+        if (this.$route.name === "search") {
+          this.$router.replace(location)
+        } else {
+          this.$router.push(location)
+        }
+
       }
     }
   }
@@ -194,14 +204,18 @@ export default {
       z-index: 999;
 
       // 指定过度样式
-      &.slide-enter-active,&slide-leave-active {
-        transition:all .5s
+      &.slide-enter-active,
+      &slide-leave-active {
+        transition: all .5s
       }
+
       // 指定隐藏样式
-      &.slide-enter,&slide-leave-to {
+      &.slide-enter,
+      &slide-leave-to {
         opacity: 0;
         height: 0;
       }
+
       .all-sort-list2 {
         .item {
           h3 {

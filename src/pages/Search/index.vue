@@ -11,19 +11,32 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
+
             <li class="with-x" v-if="options.categoryname">
               {{ options.categoryname }}
               <i @click="removeCategory">×</i>
             </li>
+
             <li class="with-x" v-if="options.keyword">
               {{ options.keyword }}
               <i @click="removeKeyword">×</i>
             </li>
+
+            <li class="with-x" v-if="options.trademark">
+              {{ options.trademark }}
+              <i @click="removeTrademark">×</i>
+            </li>
+
+            <li class="with-x" v-for="prop in options.props" :key="prop">
+              {{ prop }}
+              <i @click="removeProp(index)">×</i>
+            </li>
+            
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector :setTrademark="setTrademark" @addProp="addProp"/>
 
         <!--details-->
         <div class="details clearfix">
@@ -140,10 +153,10 @@ export default {
   },
 
   // 在created中收集参数数据到options中，并发送搜索的请求
-  created() {
-    this.updateParams()
-    this.getShopList()
-  },
+  // created() {
+  //   this.updateParams()
+  //   this.getShopList()
+  // },
 
   computed: {
     // ...mapState({
@@ -153,40 +166,100 @@ export default {
   },
 
   watch: {
-    $route(to, from) {//参数变化
-      this.updateParams()
-      this.getShopList()
+    // $route(to, from) {//参数变化
+    //   this.updateParams()
+    //   this.getShopList()
+    // }
+    $route: {
+      handler() { //参数变化
+        this.updateParams()
+        this.getShopList()
+      },
+      immediate: true //初始化时立即执行第一次
     }
   },
 
   methods: {
-    // 删除分类的条件
-    removeCategory  () {
+    /* 
+    删除一个属性条件 
+    */
+    removeProp (index) {
+      // 删除props中index的元素
+      this.options.props.splice(index,1)
+      // 重新请求获取数据列表
+      this.getShopList()
+    },
+
+    /* 
+    添加一个属性条件 
+    */
+    addProp (prop) {
+      const {props} = this.options
+      // 如果已经存在条件数组中,不添加
+      if (props.includes(prop)) return
+      // 向props数组添加一个条件字符串  子向父通信==>vue自定义事件
+      props.push(prop)
+      // 重新请求获取数据列表
+      this.getShopList()
+    },
+
+    /* 
+    删除品牌条件 
+    */
+    removeTrademark() {
+      // 重置品牌条件数据
+      this.options.trademark = ''
+      // 重新请求获取数据列表
+      this.getShopList()
+    },
+    /* 
+    设置品牌条件 
+    */
+    setTrademark(trademark) {
+      // 如果当前品牌已经在条件中，直接结束
+      if (trademark === this.options.trademark) {
+        return
+      }
+      // 更新options中的trademark为指定的值
+      this.options.trademark = trademark
+      // 重新请求获取数据列表
+      this.getShopList()
+    },
+
+
+    /* 
+    删除分类的条件
+    */
+    removeCategory() {
       // 更新分类相关数据
-        this.options.category1Id = ''
-        this.options.category2Id = ''
-        this.options.category3Id = ''
-        this.options.categoryname =  ''
+      this.options.category1Id = ''
+      this.options.category2Id = ''
+      this.options.category3Id = ''
+      this.options.categoryname = ''
       // 重新跳转到search，不在携带删除的条件所对应的参数
-      this.$router.push({
-        name:'search',
-        query:this.$route.params
+      this.$router.replace({
+        name: 'search',
+        query: this.$route.params
       })
     },
 
-    // 删除关键字的条件
-    removeKeyword  () {
-      this.options.keyword=''
+    /* 
+    删除关键字的条件
+    */
+    removeKeyword() {
+      this.options.keyword = ''
       // 重新跳转到search，不在携带删除的条件所对应的参数
-      this.$router.push({
-        name:'search',
-        query:this.$route.query
+      this.$router.replace({
+        name: 'search',
+        query: this.$route.query
       })
       // 在search中分发事件(清除Header的搜索框)
       this.$bus.$emit('removeKeyword')
     },
 
-    // 更新options中的参数属性
+    /*
+    更新options中的参数属性 
+    */
     updateParams() {
       // 取出参数数据
       const { keyword } = this.$route.params
@@ -201,7 +274,9 @@ export default {
         categoryname
       }
     },
-    // 异步获取商品列表
+    /* 
+    异步获取商品列表 
+    */
     getShopList() {
       // 发搜索请求
       this.$store.dispatch('getProductList', this.options)
