@@ -31,35 +31,49 @@
               {{ prop }}
               <i @click="removeProp(index)">×</i>
             </li>
-            
+
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector :setTrademark="setTrademark" @addProp="addProp"/>
+        <SearchSelector :setTrademark="setTrademark" @addProp="addProp" />
 
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <!-- reder: '1:desc' -->
+                <li :class="{ active: orderArr[0] === '1' }" @click="setOrder('1')">
+                  <a href="javascript:">
+                    综合
+                    <i class="iconfont" :class="orderArr[1] === 'desc' ? 'icon-down' : 'icon-up'"
+                      v-if="orderArr[0] === '1'"></i>
+                  </a>
                 </li>
-                <li>
-                  <a href="#">销量</a>
+
+                <li :class="{ active: orderArr[0] === '3' }" @click="setOrder('3')">
+                  <a href="javascript:">
+                    销量
+                    <i class="iconfont" :class="orderArr[1] === 'desc' ? 'icon-down' : 'icon-up'"
+                      v-if="orderArr[0] === '3'"></i>
+                  </a>
                 </li>
+
                 <li>
-                  <a href="#">新品</a>
+                  <a href="javascript:">新品</a>
                 </li>
+
                 <li>
-                  <a href="#">评价</a>
+                  <a href="javascript:">评价</a>
                 </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+
+                <li :class="{ active: orderArr[0] === '2' }" @click="setOrder('2')">
+                  <a href="javascript:">
+                    价格
+                    <i class="iconfont" :class="orderArr[1] === 'desc' ? 'icon-down' : 'icon-up'"
+                      v-if="orderArr[0] === '2'"></i>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -142,9 +156,9 @@ export default {
         categoryname: '', // 分类名称
         keyword: '', // 关键字
 
-        trademark: '', // 品牌  "ID:品牌名称"
+        //trademark: '', // 品牌  "ID:品牌名称"
         props: [], // 商品属性的数组: ["属性ID:属性值:属性名"] 示例: ["2:6.0～6.24英寸:屏幕尺寸"]
-        order: '2:desc', // 排序方式  1: 综合,2: 价格 asc: 升序,desc: 降序  示例: "1:desc"
+        order: '1:desc', // 排序方式  1: 综合,2: 价格 asc: 升序,desc: 降序  示例: "1:desc"
 
         pageNo: 1, // 当前页码
         pageSize: 5, // 每页数量
@@ -162,7 +176,14 @@ export default {
     // ...mapState({
     //   goodsList:state => state.search.productList.goodsList
     // })
-    ...mapGetters(['goodsList'])
+    ...mapGetters(['goodsList']),
+
+    /* 
+    得到包含当前分类项标识(orderFlag)和排序方式(orderType)的数组 
+    */
+    orderArr() {
+      return this.options.order.split(':')
+    }
   },
 
   watch: {
@@ -181,11 +202,31 @@ export default {
 
   methods: {
     /* 
+    设置新的排序搜索 
+    */
+    setOrder (orderFlag) {
+      // 得到当前的排序项和排序方式
+      let [flag,type] = this.orderArr
+      // 点击的是当前排序项,只需要切换orderType
+      if (orderFlag===flag) {
+        type = type === 'desc' ? 'asc' : 'desc'
+      } else {
+        // 点击的不是当前排序项:更新orderFlag为指定的值,orderType更新为desc
+        flag = orderFlag
+        type = 'desc'
+      }
+      // 请求获取商品分页列表
+      this.options.order=flag + ':' + type
+      this.getShopList()
+    },
+
+
+    /* 
     删除一个属性条件 
     */
-    removeProp (index) {
+    removeProp(index) {
       // 删除props中index的元素
-      this.options.props.splice(index,1)
+      this.options.props.splice(index, 1)
       // 重新请求获取数据列表
       this.getShopList()
     },
@@ -193,8 +234,8 @@ export default {
     /* 
     添加一个属性条件 
     */
-    addProp (prop) {
-      const {props} = this.options
+    addProp(prop) {
+      const { props } = this.options
       // 如果已经存在条件数组中,不添加
       if (props.includes(prop)) return
       // 向props数组添加一个条件字符串  子向父通信==>vue自定义事件
@@ -208,7 +249,8 @@ export default {
     */
     removeTrademark() {
       // 重置品牌条件数据
-      this.options.trademark = ''
+      // this.options.trademark = ''
+      this.$delete(this.options,'trademark')
       // 重新请求获取数据列表
       this.getShopList()
     },
@@ -221,7 +263,8 @@ export default {
         return
       }
       // 更新options中的trademark为指定的值
-      this.options.trademark = trademark
+      // this.options.trademark = trademark
+      this.$set(this.options,'trademark',trademark)
       // 重新请求获取数据列表
       this.getShopList()
     },

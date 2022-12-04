@@ -18,6 +18,14 @@ const mutations = {
 const actions = {
     // 根据指定的搜索条件，异步获取商品列表的action
     async getProductList({ commit }, searchParams) {
+        // 因为不想删除search组件中的options中的属性
+        searchParams = {...searchParams}
+        // 删除searchParams中的空串或数组属性
+        Object.keys(searchParams).forEach(key => {
+            if (searchParams[key]=== '' || (Array.isArray(searchParams[key]) && searchParams[key].length===0)) {
+                delete searchParams[key]
+            }
+        })
 
         // 1.ajax请求，获取数据
         const result = await reqSearch(searchParams)
