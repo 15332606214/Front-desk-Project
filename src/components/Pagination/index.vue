@@ -4,11 +4,11 @@
         <button v-if="(startEnd.start>1)" @click="setCurrentPage(1)">1</button>
         <button class="disable">...</button>
         
-        <!-- 多执行了从1到start-1的v-for遍历和v-if的判断
-            <button v-for="item in startEnd.end"  v-if="item>=startEnd.start"
+        <!-- 多执行了从1到start-1的v-for遍历和v-if的判断 -->
+            <!-- <button v-for="item in startEnd.end" :key="item" v-if="item>=startEnd.start"
             :class="{active:item===myCurrentPage}"
             @click="setCurrentPage(item)">{{item}}</button> -->
-            <button v-for="item in startEndArr"
+            <button v-for="item in startEndArr" :key="item"
             :class="{active:item===myCurrentPage}" @click="setCurrentPage(item)">{{item}}</button>
  
         <button class="disable" v-if="(startEnd.end<totalPages-1)">...</button>

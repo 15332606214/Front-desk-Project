@@ -26,3 +26,11 @@ export const reqFloors = () => mockAjax('/floors')
 
 // 搜索分页列表  /api/list  post 
 export const reqSearch = (searchParams) => ajax.post('/list',searchParams)
+
+// 获取详细数据  /api/list/{ skuId }  get
+export const reqDetailInfo = (skuId) => {
+    return ajax({
+        url:`/item/${ skuId }`,
+        method:'get'
+    })
+}
