@@ -1,15 +1,19 @@
 <template>
     <div class="pagination">
-        <button :class="{disable:myCurrentPage===1}">上一页</button>
-        <button v-if="(startEnd.start>1)">1</button>
+        <button :disabled="(myCurrentPage===1)" :class="{disable:myCurrentPage===1}" @click="setCurrentPage(myCurrentPage-1)">上一页</button>
+        <button v-if="(startEnd.start>1)" @click="setCurrentPage(1)">1</button>
         <button class="disable">...</button>
         
-        <button v-for="item in startEnd.end"  v-if="item>=startEnd.start"
-            :class="{active:item===myCurrentPage}">{{item}}</button>
-
+        <!-- 多执行了从1到start-1的v-for遍历和v-if的判断
+            <button v-for="item in startEnd.end"  v-if="item>=startEnd.start"
+            :class="{active:item===myCurrentPage}"
+            @click="setCurrentPage(item)">{{item}}</button> -->
+            <button v-for="item in startEndArr"
+            :class="{active:item===myCurrentPage}" @click="setCurrentPage(item)">{{item}}</button>
+ 
         <button class="disable" v-if="(startEnd.end<totalPages-1)">...</button>
-        <button v-if="(startEnd.end<totalPages)">{{totalPages}}---{{startEnd.end}}</button>
-        <button :class="{disable:myCurrentPage===totalPages}">下一页</button>
+        <button v-if="(startEnd.end<totalPages)" @click="setCurrentPage(totalPages)">{{totalPages}}</button>
+        <button :class="{disable:myCurrentPage===totalPages}" @click="setCurrentPage(myCurrentPage+1)">下一页</button>
         <button class="disable">共 {{total}} 条</button>
     </div>
 </template>
@@ -55,6 +59,18 @@ export default {
             return Math.ceil(total / pageSize)
         },
 
+        /*
+        包含从start到end的数组  
+        */
+        startEndArr () {
+            const arr = []
+            const {start,end} = this.startEnd
+            for (let page = start; page <= end; page++) {
+                arr.push(page);
+            }
+            return arr
+        },
+
         /* 
         start/end:连续页码数的开始页码与结束页码{start:3,end:7} 
         */
@@ -79,6 +95,31 @@ export default {
             }
             return { start, end }
         },
+    },
+
+    watch:{
+        /* 
+        子组件监视父组件传入的数据变化 
+        */
+       currentPage (value) {
+        this.myCurrentPage = value
+       }
+    },
+
+
+    methods:{
+        /* 
+        设置新的当前页码 
+        */
+       setCurrentPage(page) {
+            // 如果页码没有变化，直接结束
+            if(page===this.myCurrentPage) return
+
+            this.myCurrentPage = page
+
+            // 分发自定义事件通知父组件
+            this.$emit('currentChange',page)
+       }
     }
 }
 </script>

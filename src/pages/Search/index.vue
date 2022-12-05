@@ -113,7 +113,7 @@
           :total="total"
           :pageSize="options.pageSize"
           :showPageNo="3"
-          @currentChange="currentChange"
+          @currentChange="getShopList()"
           ></Pagination>
         </div>
       </div>
@@ -140,7 +140,7 @@ export default {
         order: '1:desc', // 排序方式  1: 综合,2: 价格 asc: 升序,desc: 降序  示例: "1:desc"
 
         pageNo: 1, // 当前页码
-        pageSize: 3, // 每页数量
+        pageSize: 5, // 每页数量
       }
     }
   },
@@ -181,10 +181,9 @@ export default {
 
   methods: {
     // 当前页码发生改变的事件回调
-    currentChange (page) {
-      this.options.pageNo = page
-      this.getShopList()
-    },
+    // currentChange (page) {
+    //   this.getShopList(page)
+    // },
 
 
     /* 
@@ -306,7 +305,10 @@ export default {
     /* 
     异步获取商品列表 
     */
-    getShopList() {
+    getShopList(page=1) {
+      // 更新options中的pageNo
+      this.options.pageNo = page
+
       // 发搜索请求
       this.$store.dispatch('getProductList', this.options)
     }
