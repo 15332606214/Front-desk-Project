@@ -4,6 +4,7 @@ import Search from "../pages/Search";
 import Login from "../pages/Login";
 import Register from "@/pages/Register";
 import Detail from "@/pages/detail";
+import AddCartSuccess from "@/pages/AddCartSuccess";
 
 export default[ 
 {
@@ -28,5 +29,8 @@ export default[
 },{
     path:'/detail/:skuId',
     component:Detail,
+},{
+    path:'/addcartsuccess',
+    component:AddCartSuccess,
 }        
 ]

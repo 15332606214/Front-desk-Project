@@ -84,7 +84,7 @@
                 <a href="javascript:" class="mins" @click="skuNum > 1 ? skuNum-- : skuNum = 1">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a href="javascript:" @click="addShopCart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -383,6 +383,37 @@ export default {
       spuSaleAttrValueList.forEach(item => item.isChecked = '0')
       // 第二步：被点击的属性值变绿
       spuSaleAttrValue.isChecked = '1'
+    },
+
+    // 添加购物车按钮点击之后的逻辑
+    async addShopCart(){
+      // 发请求让后台给数据库的购物车数据表中添加一条数据
+
+      // 根据添加成功还是失败来决定要不要跳转到添加购物车成功页面
+      let {skuId,skuNum} = this
+      // dispatch分发触发的意思，其实就是调用响应的actions函数
+      // 如下就是函数调用表达式，结果是actions当中异步函数的返回值，异步函数返回值一定是promise
+      try {
+        const result = await this.$store.dispatch('addOrUpdateCart',{skuId,skuNum})
+        alert('添加购物车成功')
+
+        // 成功需要跳转，编程式导航跳转
+        // 添加购物车成功页面需要商品数量和商品的详细信息
+
+        /* 如果碰到的是简单数据，那么我们考虑路由传参
+        如果碰到的是复杂数据，我们考虑存储手段
+        localStorage    setItem     getItem   removeItem  clear
+        sessionStorage setItem     getItem   removeItem  clear
+        区别：localStorage是永久存储 sessionStorage浏览器关掉就没了
+        */
+        sessionStorage.setItem('SKUINFO_KEY',JSON.stringify(this.skuInfo))
+
+        this.$router.push('/addcartsuccess?skuNum='+this.skuNum)
+
+      } catch (error){
+        alert(error.message)
+      }
+      
     }
   }
 }
