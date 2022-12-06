@@ -16,9 +16,9 @@
         <!-- 左侧放大镜区域 -->
         <div class="previewWrap">
           <!--放大镜效果-->
-          <Zoom :imgList="imgList"/>
+          <Zoom :imgList="imgList" />
           <!-- 小图列表 -->
-          <ImageList :imgList="imgList"/>
+          <ImageList :imgList="imgList" />
         </div>
         <!-- 右侧选择区域布局 -->
         <div class="InfoWrap">
@@ -65,20 +65,23 @@
               <div class="choosed"></div>
               <dl v-for="spuSaleAttr in spuSaleAttrList" :key="spuSaleAttr.id">
                 <dt class="title">{{ spuSaleAttr.spuSaleAttrName }}</dt>
-                <dd changepirce="0" 
-                :class="{active:spuSaleAttrValue.isChecked==='1'}" 
-                v-for="spuSaleAttrValue in spuSaleAttr.spuSaleAttrValueList"
-                  :key="spuSaleAttrValue.id"
-                  @click="changeChecked(spuSaleAttrValue,spuSaleAttr.spuSaleAttrValueList)">
+                <dd changepirce="0" :class="{ active: spuSaleAttrValue.isChecked === '1' }"
+                  v-for="spuSaleAttrValue in spuSaleAttr.spuSaleAttrValueList" :key="spuSaleAttrValue.id"
+                  @click="changeChecked(spuSaleAttrValue, spuSaleAttr.spuSaleAttrValueList)">
                   {{ spuSaleAttrValue.saleAttrValueName }}
                 </dd>
               </dl>
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt">
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <!-- 
+                  input事件 输入的时候同步触发
+                  blur事件 失去焦点时触发，不管内容有没有变化
+                  change事件 失去焦点时触发，但是内容必须变化 
+                -->
+                <input autocomplete="off" class="itxt" v-model="skuNum" @change="skuNum = skuNum >= 1 ? parseInt(skuNum) : 1" />
+                <a href="javascript:" class="plus" @click="skuNum++">+</a>
+                <a href="javascript:" class="mins" @click="skuNum > 1 ? skuNum-- : skuNum = 1">-</a>
               </div>
               <div class="add">
                 <a href="javascript:">加入购物车</a>
@@ -340,7 +343,8 @@ export default {
   name: 'Detail',
   data() {
     return {
-      skuId: ''
+      skuId: '',
+      skuNum: 1
     }
   },
 
@@ -355,7 +359,7 @@ export default {
     // },    如下为简写
     ...mapGetters(['categoryView', 'skuInfo', 'spuSaleAttrList']),
 
-    imgList(){
+    imgList() {
       return this.skuInfo.skuImageList || []
     }
   },
@@ -374,11 +378,11 @@ export default {
       this.$store.dispatch('getSkuDetailInfo', this.skuId)
     },
     // 排他处理用户点击选择销售属性值（谁变绿）
-    changeChecked(spuSaleAttrValue,spuSaleAttrValueList){
+    changeChecked(spuSaleAttrValue, spuSaleAttrValueList) {
       // 第一步：所有属性值全变白
-      spuSaleAttrValueList.forEach(item => item.isChecked='0')
+      spuSaleAttrValueList.forEach(item => item.isChecked = '0')
       // 第二步：被点击的属性值变绿
-      spuSaleAttrValue.isChecked='1'
+      spuSaleAttrValue.isChecked = '1'
     }
   }
 }

@@ -1,11 +1,11 @@
 <template>
   <div class="spec-preview">
     <img :src="defalutImg.imgUrl" />
-    <div class="event"></div>
+    <div class="event" @mousemove="move"></div>
     <div class="big">
-      <img :src="defalutImg.imgUrl" />
+      <img :src="defalutImg.imgUrl" ref="big"/>
     </div>
-    <div class="mask"></div>
+    <div class="mask" ref="mask"></div>
   </div>
 </template>
 
@@ -15,13 +15,56 @@
     props: ['imgList'],
     data(){
       return {
-        defaultIndex:0 //显示图片的默认下标
+        defaultIndex:0 ,//显示图片的默认下标
       }
     },
+
+    mounted(){
+      this.$bus.$on('syncDefaultIndex',this.syncDefaultIndex)
+    },
+
     computed:{
       // 解决假报错 不能再上边直接写 mgList[defaultIndex].imgUrl
       defalutImg(){
         return this.imgList[this.defaultIndex] || {}
+      }
+    },
+
+    methods:{
+      syncDefaultIndex(index){
+        this.defaultIndex=index
+
+        // 通过全局事件总线把选中的index传给zoom
+        this.$bus.$emit('syncDefaultIndex',index)
+      },
+      move(event){
+        // 1,添加鼠标移动事件
+        let mouseX = event.offsetX
+        let mouseY = event.offsetY
+
+        // 2,计算遮罩的位置
+        let mask=this.$refs.mask
+        let maskX = mouseX - mask.offsetWidth/2
+        let maskY = mouseY - mask.offsetHeight/2
+        let big = this.$refs.big
+        // 2.2设置临界值
+        if(maskX < 0){
+          maskX = 0
+        } else if (maskX > mask.offsetWidth){
+          maskX = mask.offsetWidth
+        }
+        if(maskY < 0){
+          maskY = 0
+        } else if (maskY > mask.offsetHeight){
+          maskY = mask.offsetHeight
+        }
+
+        mask.style.left=maskX+'px'
+        mask.style.top=maskY+'px'
+
+        // 3,大图动
+        big.style.left = -maskX*2+'px'
+        big.style.top = -maskY*2+'px'
       }
     }
   }
