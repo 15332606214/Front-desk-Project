@@ -5,6 +5,8 @@ import axios from "axios";
 import NProgress from "nprogress";
 import 'nprogress/nprogress.css'
 
+import store from "@/store";
+
 // 1，配置基础的路径和超时
 // service是一个能发任意ajax请求的函数，可以作为对象使用
 const service = axios.create({
@@ -16,6 +18,11 @@ const service = axios.create({
 service.interceptors.request.use((config)=>{
     // 2，显示请求进度条
     NProgress.start()
+
+    let userTempId = store.state.user.userTempId
+    if(userTempId){
+        config.headers.userTempId = userTempId
+    }
 
     // 必须返回config。后面会根据返回的config，使用xhr对象发送请求
     return config
