@@ -11,25 +11,26 @@
         <div class="cart-th6">操作</div>
       </div>
       <div class="cart-body">
-        <ul class="cart-list" v-for="shopCart in shopCartList" :key="shopCart.id">
+        <!-- 未遍历完成 -->
+        <ul class="cart-list" v-for="shopCart in shopCartList.cartInfoList" :key="shopCart.id">
           <li class="cart-list-con1">
-            <input type="checkbox" name="chk_list">
+            <input type="checkbox" name="chk_list" :checked="shopCart.isChecked">
           </li>
           <li class="cart-list-con2">
-            <img src="./images/goods1.png">
-            <div class="item-msg">米家（MIJIA） 小米小白智能摄像机增强版 1080p高清360度全景拍摄AI增强</div>
+            <img :src="shopCart.imgUrl">
+            <div class="item-msg">{{ shopCart.skuName }}</div>
           </li>
 
           <li class="cart-list-con4">
-            <span class="price">399.00</span>
+            <span class="price">{{ shopCart.cartPrice }}</span>
           </li>
           <li class="cart-list-con5">
             <a href="javascript:void(0)" class="mins">-</a>
-            <input autocomplete="off" type="text" value="1" minnum="1" class="itxt">
+            <input autocomplete="off" type="text" :value="shopCart.skuNum" minnum="1" class="itxt">
             <a href="javascript:void(0)" class="plus">+</a>
           </li>
           <li class="cart-list-con6">
-            <span class="sum">399</span>
+            <span class="sum">{{ (shopCart.cartPrice * shopCart.skuNum) }}</span>
           </li>
           <li class="cart-list-con7">
             <a href="#none" class="sindelet">删除</a>
@@ -41,7 +42,7 @@
     </div>
     <div class="cart-tool">
       <div class="select-all">
-        <input class="chooseAll" type="checkbox">
+        <input class="chooseAll" type="checkbox" v-model="isAllCheck">
         <span>全选</span>
       </div>
       <div class="option">
@@ -51,11 +52,11 @@
       </div>
       <div class="money-box">
         <div class="chosed">已选择
-          <span>0</span>件商品
+          <span>{{checkedNum}}</span>件商品
         </div>
         <div class="sumprice">
           <em>总价（不含运费） ：</em>
-          <i class="summoney">0</i>
+          <i class="summoney">{{allMoney}}</i>
         </div>
         <div class="sumbtn">
           <a class="sum-btn" href="###" target="_blank">结算</a>
@@ -75,13 +76,39 @@ export default {
   methods: {
     getCartList() {
       this.$store.dispatch('getCartList')
-    }
+    },
   },
   computed: {
     // ...mapState使用数组 必须名字相同 数组只能总的state当中的数据才能使用，模块化后不能使用
     ...mapState({
-      shopCartList: state => state.shopcart.shopCartList
-    })
+      shopCartList: state => state.shopcart.shopCartList || []
+    }),
+    // 选的商品数
+    checkedNum() {
+      return this.shopCartList.reduce((prev, item) => {
+        if (item.isChecked) {
+          prev += item.skuNum
+        }
+        return prev
+      }, 0)
+    },
+    // 商品总价
+    allMoney() {
+      return this.shopCartList.reduce((prev, item) => {
+        if (item.isChecked) {
+          prev += item.cartPrice * item.skuNum
+        }
+        return prev
+      }, 0)
+    },
+    isAllCheck:{
+      get(){
+        this.shopCartList.every(item=>item.isChecked)
+      },
+      set(){
+         
+      }
+    }
   }
 }
 </script>
