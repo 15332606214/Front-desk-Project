@@ -75,8 +75,27 @@ export const reqUserRegister = (userInfo) => {
 // post
 export const reqUserLogin = (userInfo) => {
     return ajax({
-        url: `/user/passport/login`,
+        url: `http://gmall-h5-api.atguigu.cn/api/user/passport/login`,
         method: 'post',
         data: userInfo
+    })
+}
+
+// 根据token获取用户信息
+// /api/user/passport/auth/getUserInfo
+// get
+export const reqUserInfo = () =>{
+    return ajax({
+        url:'/user/passport/auth/getUserInfo'
+    })
+}
+
+// 退出登录
+// /api/user/passport/logout
+// get
+export const reqUserLogout=()=>{
+    return ajax({
+        url:'/user/passport/logout',
+        method:'get'
     })
 }

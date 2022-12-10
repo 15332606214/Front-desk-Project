@@ -83,13 +83,13 @@
           try {
             await this.$store.dispatch('userLogin',{phone,password})
             alert('登陆成功，准备跳转首页')
-            this.$router.push('/')
+            // 和导航守卫配合使用，去想去但没有去的地方
+            let redirect = this.$route.query.redirect || '/'
+            this.$router.push(redirect)
           } catch (error) {
             alert(error.message)
           }
         }
-        
-        
       }
     }
   }
